@@ -399,8 +399,8 @@ def main(argv=None, input=None, output=None, force_git_root=None, return_coder=F
     # If we guessed wrong, reparse because that changes things like
     # the location of the config.yml and history files.
     if args.git and not force_git_root:
-        right_repo_root = guessed_wrong_repo(io, git_root, fnames, git_dname)
-        if right_repo_root:
+        right_repo_root = get_git_root()
+        if right_repo_root and right_repo_root != git_root:
             return main(argv, input, output, right_repo_root, return_coder=return_coder)
 
     if args.just_check_update:
