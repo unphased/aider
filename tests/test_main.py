@@ -1,6 +1,7 @@
 import unittest
 from unittest.mock import patch
 from pathlib import Path
+import git
 
 from aider.main import get_git_root, resolve_config_path
 
