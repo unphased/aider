@@ -18,6 +18,7 @@ from aider.io import InputOutput
 from aider.llm import litellm  # noqa: F401; properly init litellm on launch
 from aider.repo import GitRepo
 from aider.versioncheck import check_version
+from aider.utils import resolve_config_path
 
 from .dump import dump  # noqa: F401
 
@@ -29,22 +30,6 @@ def get_git_root(start_path=None):
         return repo.working_tree_dir
     except git.InvalidGitRepositoryError:
         return None
-
-def resolve_config_path(config_path, git_root):
-    """Resolve the config file path, preferring the git root if it exists"""
-    if git_root:
-        git_config = Path(git_root) / config_path
-        if git_config.exists():
-            return str(git_config)
-    return str(Path(config_path).resolve())
-
-def resolve_config_path(config_path, git_root):
-    """Resolve the config file path, preferring the git root if it exists"""
-    if git_root:
-        git_config = Path(git_root) / config_path
-        if git_config.exists():
-            return str(git_config)
-    return str(Path(config_path).resolve())
 
 
 def setup_git(git_root, io):
