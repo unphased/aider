@@ -84,6 +84,27 @@ class GitRepo:
         if aider_ignore_file:
             self.aider_ignore_file = Path(aider_ignore_file).resolve()
 
+    def normalize_path(self, path):
+        orig_path = path
+        res = self.normalized_path.get(orig_path)
+        if res:
+            return res
+
+        path = str(Path(PurePosixPath((Path(self.root) / path).relative_to(self.root))))
+        self.normalized_path[orig_path] = path
+        return path
+
+    def path_in_repo(self, path):
+        if not self.repo:
+            return
+
+        try:
+            normalized_path = self.normalize_path(path)
+            abs_path = (Path(self.root) / normalized_path).resolve()
+            return abs_path.is_relative_to(Path(self.root))
+        except ValueError:
+            return False
+
     def commit(self, fnames=None, context=None, message=None, aider_edits=False):
         if not fnames and not self.repo.is_dirty():
             return
