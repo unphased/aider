@@ -1,16 +1,17 @@
+import os
 import unittest
-from unittest.mock import Mock, patch
 from pathlib import Path
+from unittest.mock import Mock, patch
 
+from aider.io import InputOutput
 from aider.repo import GitRepo
 
 class TestGitRepo(unittest.TestCase):
 
     def setUp(self):
-        self.mock_io = Mock()
-        self.mock_repo = Mock()
+        self.mock_io = InputOutput()
         self.git_repo = GitRepo(self.mock_io, [], None)
-        self.git_repo.repo = self.mock_repo
+        self.git_repo.repo = Mock()
         self.git_repo.root = '/path/to/repo'
 
     def test_normalize_path(self):
@@ -30,3 +31,5 @@ class TestGitRepo(unittest.TestCase):
 
         mock_is_relative_to.return_value = False
         self.assertFalse(self.git_repo.path_in_repo('outside_file.txt'))
+
+    # Add more tests here as needed, following the style in tests/basic/test_repo.py
