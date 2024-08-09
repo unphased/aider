@@ -578,16 +578,6 @@ class Commands:
                     self.coder.check_added_files()
                     added_fnames.append(matched_file)
 
-        if not added_fnames:
-            return
-
-        # only reply if there's been some chatting since the last edit
-        if not self.coder.cur_messages:
-            return
-
-        reply = prompts.added_files.format(fnames=", ".join(added_fnames))
-        return reply
-
     def completions_drop(self):
         files = self.coder.get_inchat_relative_files()
         files = [self.quote_fname(fn) for fn in files]
@@ -898,15 +888,25 @@ class Commands:
         return text
 
     def cmd_clipboard(self, args):
-        "Add content from the clipboard to the chat (supports both text and images)"
+        "Add image/text from the clipboard to the chat (optionally provide a name for the image)"
         try:
             # Check for image first
             image = ImageGrab.grabclipboard()
             if isinstance(image, Image.Image):
-                basename = args.strip() if args.strip() else "clipboard_image"
+                if args.strip():
+                    filename = args.strip()
+                    ext = os.path.splitext(filename)[1].lower()
+                    if ext in (".jpg", ".jpeg", ".png"):
+                        basename = filename
+                    else:
+                        basename = f"{filename}.png"
+                else:
+                    basename = "clipboard_image.png"
+
                 temp_dir = tempfile.mkdtemp()
-                temp_file_path = os.path.join(temp_dir, f"{basename}.png")
-                image.save(temp_file_path, "PNG")
+                temp_file_path = os.path.join(temp_dir, basename)
+                image_format = "PNG" if basename.lower().endswith(".png") else "JPEG"
+                image.save(temp_file_path, image_format)
 
                 abs_file_path = Path(temp_file_path).resolve()
 
@@ -922,7 +922,7 @@ class Commands:
                 self.io.tool_output(f"Added clipboard image to the chat: {abs_file_path}")
                 self.coder.check_added_files()
 
-                return prompts.added_files.format(fnames=str(abs_file_path))
+                return
 
             # If not an image, try to get text
             text = pyperclip.paste()
