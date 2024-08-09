@@ -24,7 +24,7 @@ def get_parser(default_config_files, git_root):
     parser = configargparse.ArgumentParser(
         description="aider is GPT powered coding in your terminal",
         add_config_file_help=True,
-        default_config_files=default_config_files,
+        default_config_files=[resolve_config_path(f, git_root) for f in default_config_files],
         auto_env_var_prefix="AIDER_",
     )
     group = parser.add_argument_group("Main")

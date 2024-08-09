@@ -22,32 +22,21 @@ from aider.versioncheck import check_version
 from .dump import dump  # noqa: F401
 
 
-def get_git_root():
-    """Try and guess the git repo, since the conf.yml can be at the repo root"""
+def get_git_root(start_path=None):
+    """Find the git repo root, starting from the given path or current directory"""
     try:
-        repo = git.Repo(search_parent_directories=True)
+        repo = git.Repo(start_path or os.getcwd(), search_parent_directories=True)
         return repo.working_tree_dir
     except git.InvalidGitRepositoryError:
         return None
 
-
-def guessed_wrong_repo(io, git_root, fnames, git_dname):
-    """After we parse the args, we can determine the real repo. Did we guess wrong?"""
-
-    try:
-        check_repo = Path(GitRepo(io, fnames, git_dname).root).resolve()
-    except FileNotFoundError:
-        return
-
-    # we had no guess, rely on the "true" repo result
-    if not git_root:
-        return str(check_repo)
-
-    git_root = Path(git_root).resolve()
-    if check_repo == git_root:
-        return
-
-    return str(check_repo)
+def resolve_config_path(config_path, git_root):
+    """Resolve the config file path, preferring the git root if it exists"""
+    if git_root:
+        git_config = Path(git_root) / config_path
+        if git_config.exists():
+            return str(git_config)
+    return str(Path(config_path).resolve())
 
 
 def setup_git(git_root, io):

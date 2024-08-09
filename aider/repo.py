@@ -55,8 +55,7 @@ class GitRepo:
 
         repo_paths = []
         for fname in check_fnames:
-            fname = Path(fname)
-            fname = fname.resolve()
+            fname = Path(fname).resolve()
 
             if not fname.exists() and fname.parent.exists():
                 fname = fname.parent
@@ -83,7 +82,7 @@ class GitRepo:
         self.root = utils.safe_abs_path(self.repo.working_tree_dir)
 
         if aider_ignore_file:
-            self.aider_ignore_file = Path(aider_ignore_file)
+            self.aider_ignore_file = Path(aider_ignore_file).resolve()
 
     def commit(self, fnames=None, context=None, message=None, aider_edits=False):
         if not fnames and not self.repo.is_dirty():
