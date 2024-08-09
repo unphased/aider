@@ -14,6 +14,7 @@ from aider.models import Model
 from aider.repo import GitRepo
 from aider.utils import GitTemporaryDirectory
 
+
 class TestRepo(unittest.TestCase):
     def setUp(self):
         self.GPT35 = Model("gpt-3.5-turbo")
